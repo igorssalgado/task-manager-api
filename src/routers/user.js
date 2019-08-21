@@ -1,6 +1,6 @@
 const express = require('express');
 const User = require('../models/user');
-// const sharp = require('sharp'); cuz at work it is not allowed --"
+const sharp = require('sharp'); 
 const auth = require('../middleware/auth');
 const imgUploaded = require('../middleware/imgUploaded');
 const { sendWelcomeEmail, sendGoodbyeEmail } = require('../emails/account');
