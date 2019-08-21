@@ -3,6 +3,7 @@
 access task manager api from Postman or similar at {{url}} = https://git.heroku.com/rogi-task-manager.git
 
 routes available with mongoDB atlas connection and email service with SendGrid API:
+
 POST
   - Create user (creates authToken): POST/ {{url}}/users
   - Login user (create authToken): POST/ {{url}}/users/login
