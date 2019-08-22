@@ -1,6 +1,6 @@
 const express = require('express');
 const User = require('../models/user');
-// const sharp = require('sharp'); cuz at work it is not allowed --"
+const sharp = require('sharp'); 
 const auth = require('../middleware/auth');
 const imgUploaded = require('../middleware/imgUploaded');
 const { sendWelcomeEmail, sendGoodbyeEmail } = require('../emails/account');
@@ -44,18 +44,6 @@ router.post('/users/logoutAll', auth, async (req, res) => {
         res.status(500).send()
     }
 })
-
-// { USER AVAILABLE
-// 	"name": "Igor Salgado",
-// 	"email": "ksks@kkkj.com",
-// 	"password": "!saaaes2s$"
-// }
-
-// {
-// 	"name": "Taynara Derbona",
-// 	"email": "tay@gmail.com",
-// 	"password": "m0z40s2"
-// }
 
 //to login with a user and gerating a session token
 router.post('/users/login', async (req, res) => {
@@ -115,15 +103,15 @@ router.delete('/users/me', auth, async (req, res) => {
 })
 
 //to upload a avatar to an user
-// router.post('/users/me/avatar', auth, imgUploaded.single('avatar'), async (req, res) => {
-//     const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250 }).png().toBuffer()
-    
-//     req.user.avatar = buffer; //multer processed the data passed to this function, storing the avatar data on req.user.avatar field and saving it on the db
-//     await req.user.save();
-//     res.status(200).send('File uploaded successfully.');
-// }, (error, req, res, next) => {
-//     res.status(400).send({ error: error.message });
-// });
+ router.post('/users/me/avatar', auth, imgUploaded.single('avatar'), async (req, res) => {
+     const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250 }).png().toBuffer()
+  
+     req.user.avatar = buffer; //multer processed the data passed to this function, storing the avatar data on req.user.avatar field and saving it on the db
+     await req.user.save();
+     res.status(200).send('File uploaded successfully.');
+ }, (error, req, res, next) => {
+     res.status(400).send({ error: error.message });
+});
 
 router.delete('/users/me/avatar', auth, async (req, res) => {
     req.user.avatar = undefined
