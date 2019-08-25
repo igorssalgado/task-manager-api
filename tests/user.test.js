@@ -118,13 +118,16 @@ test('Should update valid user fields', async () => {
         })
         .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
         .expect(200)
+
+        const user = await User.findById(userOneId) // checks into the DB
+        expect(user.name).toEqual('Joaozinho')
 })
 
 test('Should not update invalid user fields', async () => {
     const response = await request(app)
         .patch('/users/me')
         .send({
-            location: 'rua 3w'
+            location: 'rua 3'
         })
         .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
         .expect(400)
