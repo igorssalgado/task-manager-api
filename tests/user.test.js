@@ -44,10 +44,10 @@ test('Should signup a new user', async () => {
 
 test('Should login existing user', async () => {
     const response = await request(app).post('/users/login').send({
-            email: userOne.email,
-            password: userOne.password,
+        email: userOne.email,
+        password: userOne.password,
     })
-    .expect(200)
+        .expect(200)
 
     const user = await User.findById(userOneId);
 
@@ -77,16 +77,16 @@ test('Should not get profile for unauthenticated user', async () => {
         .expect(401)
 })
 
-test('Should delete account for user', async () => {   
+test('Should delete account for user', async () => {
     await request(app)
         .delete('/users/me')
         .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
         .send()
         .expect(200)
 
-        const user = await User.findById(userOneId);
-        expect(user).toBeNull();
-      
+    const user = await User.findById(userOneId);
+    expect(user).toBeNull();
+
 })
 
 test('Should NOT delete account for user', async () => {
@@ -95,4 +95,37 @@ test('Should NOT delete account for user', async () => {
         // .set('Authorization', `Bearer ${userOne.tokens[0].token}`) // unauthenticated dont have a token
         .send()
         .expect(401)
+})
+
+
+// to send a file
+test('Should upload avatar image', async () => {
+    await request(app)
+        .post('/users/me/avatar')
+        .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+        .attach('avatar', 'tests/fixtures/profile-pic.jpg')
+        .expect(200)
+    const user = await User.findById(userOneId)
+    expect(user.avatar).toEqual(expect.any(Buffer)) // looking to avatar property and checking if it is equal to any buffer, if doesnt it is not a image..
+
+})
+
+test('Should update valid user fields', async () => {
+    const response = await request(app)
+        .patch('/users/me')
+        .send({
+            name: 'Joaozinho'
+        })
+        .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+        .expect(200)
+})
+
+test('Should not update invalid user fields', async () => {
+    const response = await request(app)
+        .patch('/users/me')
+        .send({
+            location: 'rua 3w'
+        })
+        .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+        .expect(400)
 })
