@@ -1,6 +1,8 @@
 const express = require('express');
 const Task = require('../models/task');
 const auth = require('../middleware/auth');
+const sharp = require('sharp');
+const imgUploaded = require('../middleware/imgUploaded');
 const router = new express.Router();
 
 //creates a task to the specific user
@@ -109,5 +111,51 @@ router.patch('/tasks/:id', auth, async (req, res) => {
         res.status(400).send(e);
     }
 })
+
+router.post('/tasks/:id/avatar', auth, imgUploaded.single('avatar'), async (req, res) => {
+    const task = await Task.findOne({ _id: req.params.id, owner: req.user._id })
+    const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250 }).png().toBuffer()
+ 
+    task.avatar = buffer; //multer processed the data passed to this function, storing the avatar data on req.user.avatar field and saving it on the db
+
+    await task.save();
+    res.status(200).send('File uploaded successfully.');
+}, (error, req, res, next) => {
+    res.status(400).send({ error: error.message });
+});
+
+router.get('/tasks/:id/avatar', auth, async (req, res) =>{ 
+    try {
+        const task = await Task.findById(req.params.id);
+
+        if(!task || !task.avatar) {
+            throw new Error()
+        }
+
+        console.log('ok')
+
+        res.set('Content-Type', 'image/png')
+        res.send(task.avatar);
+    }catch (e) {
+        res.status(404).send();
+    }
+})
+
+// router.delete('/tasks/:id/avatar', auth, async (req, res) => {
+//     try {
+//         const task = await Task.findById(req.params.id);
+
+//         if(!task || !task.avatar) {
+//             throw new Error()
+//         }
+
+//         console.log('ok delete')
+//         task.avatar = undefined;
+//         await task.avatar.save()
+//         res.send(task.avatar);
+//     }catch (e) {
+//         res.status(404).send();
+//     }
+// })
 
 module.exports = router;
