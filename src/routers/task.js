@@ -124,6 +124,13 @@ router.post('/tasks/:id/avatar', auth, imgUploaded.single('avatar'), async (req,
     res.status(400).send({ error: error.message });
 });
 
+router.delete('/tasks/:id/avatar', auth, async (req, res) => {
+    const task = await Task.findOne({ _id: req.params.id, owner: req.user._id })
+    task.avatar = undefined
+    await task.save();
+    res.status(200).send();
+});
+
 router.get('/tasks/:id/avatar', auth, async (req, res) =>{ 
     try {
         const task = await Task.findById(req.params.id);
